@@ -15,57 +15,81 @@ const gameIcons = [
   "🎃",
   "👹",
   "👺",
+  
+
+
 ];
 
+ 
 function App() {
-  const [pieces, setPieces] = useState([]);
-  const [tries, seTries] = useState(6);
-  const [level, setLevel] = useState(1);
-  const [gameOver, setGameOver] = useState(false);
 
-  const isGameComplted = useMemo(() => {
+  const [pieces, setPieces] = useState([]);
+
+
+
+  const [tries, seTries] = useState(6);
+
+  const [level, setLevel] = useState(1);
+  const [gameOver,setGameOver] = useState(false);
+
+
+
+  const isLevelCompleted = useMemo(() => {
     if (pieces.length > 0 && pieces.every((piece) => piece.solved)) {
       return true;
+
     }
   }, [pieces]);
 
+
+
+
+
   const startGame = () => {
-    if (gameOver) return; // Prevent restarting if game is over
+    
+     if(level>2){
+        setGameOver(true);
+        return true
+      }
+  
+    const selectedNo = level*2+2;
+    
+    
 
-    if (level > 4) {
-      setGameOver(true);
-      return;
-    }
-    const selectedNo = level * 2 + 2;
-
-    const levelGameIcon = gameIcons.slice(0, selectedNo);
-    console.log(levelGameIcon + "a");
+    const levelGameIcon = gameIcons.slice(0,selectedNo);
+    console.log(levelGameIcon+"a");
+    
 
     const dublicateIcons = [...levelGameIcon, ...levelGameIcon];
     console.log(dublicateIcons);
     console.log(dublicateIcons.length);
-
+    
     const newIcons = [];
 
     let i = 0;
 
     while (i < levelGameIcon.length * 2) {
-      const random = Math.floor(Math.random() * dublicateIcons.length);
+      const random = Math.floor(Math.random() * dublicateIcons.length );
       console.log(random);
-
+      
       newIcons.push({
         emoji: dublicateIcons[random],
         flipped: false,
         solved: false,
         position: i,
+
       });
 
-      dublicateIcons.splice(random, 1);
+      dublicateIcons.splice(random, 1)
 
       i++;
+
+
     }
     setPieces(newIcons);
-  };
+
+
+  }
 
   const handleActive = (data) => {
     const flipped = pieces.filter((piece) => piece.flipped && !piece.solved);
@@ -73,33 +97,31 @@ function App() {
 
     const newPiece = pieces.map((piece) => {
       if (piece.position === data.position) {
-        piece.flipped = !piece.flipped;
+        piece.flipped = !piece.flipped
       }
       return piece;
+
     });
 
     setPieces(newPiece);
-  };
+
+
+  }
 
   const gameLogic = () => {
     const flippedIcons = pieces.filter((piece) => piece.flipped && !piece.solved);
-
+     
     if (flippedIcons.length === 2) {
       setTimeout(() => {
         const matched = flippedIcons[0].emoji === flippedIcons[1].emoji;
 
         if (matched) {
-          setPieces(
-            pieces.map((piece) => {
-              if (
-                piece.position === flippedIcons[0].position ||
-                piece.position === flippedIcons[1].position
-              ) {
-                return { ...piece, solved: true };
-              }
-              return piece;
-            })
-          );
+          setPieces(pieces.map((piece) => {
+            if (piece.position === flippedIcons[0].position || piece.position === flippedIcons[1].position) {
+              return { ...piece, solved: true };
+            }
+            return piece;
+          }));
         } else {
           const newTries = tries - 1;
 
@@ -111,83 +133,102 @@ function App() {
 
           seTries(newTries);
 
-          setPieces(
-            pieces.map((piece) => {
-              if (
-                piece.position === flippedIcons[0].position ||
-                piece.position === flippedIcons[1].position
-              ) {
-                return { ...piece, flipped: false };
-              }
-              return piece;
-            })
-          );
+          setPieces(pieces.map((piece) => {
+            if (piece.position === flippedIcons[0].position || piece.position === flippedIcons[1].position) {
+              return { ...piece, flipped: false };
+            }
+            return piece;
+          }));
         }
       }, 1000);
     }
   };
 
+
+
   useEffect(() => {
     gameLogic();
-  }, [pieces]);
+
+  }, [pieces])
 
   useEffect(() => {
     startGame();
-  }, []);
 
+  }, []);
   console.log(pieces);
 
-  useEffect(() => {
-    if (gameOver) return; // <-- Prevent level increase and reload if game over
-
-    if (isGameComplted) {
-      setLevel(level + 1);
-
+useEffect(() => {
+  if (isLevelCompleted) {
+    // Only increase level if it's less than 2
+    if (level < 2) {
       const timeout = setTimeout(() => {
-        window.location.reload();
-      }, 3000);
-
+        setLevel(level + 1);
+      }, 2000);
       return () => clearTimeout(timeout);
+    } else {
+      // Directly end the game without showing "YOU WIN!!"
+      setGameOver(true);
     }
-  }, [isGameComplted, gameOver]);
+  }
+}, [isLevelCompleted]);
 
-  useEffect(() => {
-    startGame();
-  }, [level]);
+  useEffect(()=>{
+      startGame();
+
+  },[level]);
+
+
+
+  useEffect(()=>{
+     
+  },[isLevelCompleted])
 
   return (
     <main>
       <h1>Memory Game In React</h1>
-      <p className="tries">
-        Tries left : {tries} <span>Level {level}</span>{' '}
-      </p>
-      <div className="container">
-        {pieces.map((data, index) => (
-          <div
-            className={`flip-card ${data.flipped ? 'active' : ''}`}
-            key={index}
-            onClick={() => handleActive(data)}
-          >
-            <div className="flip-card-inner">
-              <div className="front" />
-              <div className="back">{data.emoji}</div>
+      <p className='tries' >Tries left : {tries} <span>Level {level}</span> </p>
+      <div className='container'>
+        {
+          pieces.map((data, index) => (
+            <div className={`flip-card ${data.flipped ? 'active' : ''}`} key={index} onClick={() => handleActive(data)} >
+              <div className="flip-card-inner">
+                <div className='front' />
+                <div className='back'>
+                  {data.emoji}
+                </div>
+              </div>
+
             </div>
-          </div>
-        ))}
+          ))
+        }
+
+
       </div>
-      {gameOver ? (
-        <div className="game-completed">
-          <h1>Game Completed</h1>
-          <Confetti width={window.innerWidth} height={window.innerHeight} />
-        </div>
-      ) : isGameComplted && (
-        <div className="game-completed">
-          <h1>YOU WIN!!</h1>
-          <Confetti width={window.innerWidth} height={window.innerHeight} />
-        </div>
-      )}
+      {
+        isLevelCompleted && !gameOver  && (
+          <div className='game-completed'>
+            <h1>YOU WIN!!</h1>
+            <Confetti
+              width={window.innerWidth}
+              height={window.innerHeight}
+            />
+          </div>
+        )
+      }
+      {
+        gameOver && (
+           <div className='game-completed'>
+            <h1>Game Completed</h1>
+            <Confetti
+              width={window.innerWidth}
+              height={window.innerHeight}
+            />
+          </div>
+        )
+      }
+
     </main>
-  );
+  )
 }
 
-export default App;
+export default App
