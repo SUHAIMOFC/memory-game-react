@@ -9,12 +9,11 @@ const gameIcons = [
   "👾",
   "🤖",
   "☠️",
-  "👕",
-  "👖",
   "👽",
   "🎃",
-  "👹",
-  "👺",
+ 
+  
+  
   
 
 
@@ -47,7 +46,7 @@ function App() {
 
   const startGame = () => {
     
-     if(level>2){
+     if(level > ((gameIcons.length - 4) / 2 ) +1){
         setGameOver(true);
         return true
       }
@@ -160,7 +159,7 @@ function App() {
 useEffect(() => {
   if (isLevelCompleted) {
     // Only increase level if it's less than 2
-    if (level < 2) {
+    if (level < ((gameIcons.length - 4) / 2 ) +1) {
       const timeout = setTimeout(() => {
         setLevel(level + 1);
       }, 2000);
@@ -186,7 +185,7 @@ useEffect(() => {
   return (
     <main>
       <h1>Memory Game In React</h1>
-      <p className='tries' >Tries left : {tries} <span>Level {level}</span> </p>
+    { !gameOver &&  <p className='tries' >Tries left : {tries} <span>Level {level}</span> </p>}
       <div className='container'>
         {
           pieces.map((data, index) => (
