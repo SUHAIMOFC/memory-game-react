@@ -127,7 +127,7 @@ function App() {
 
           if (newTries <= 0) {
             startGame();
-            seTries(3);
+            seTries(level*6);
             return;
           }
 
